@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lecteur Deezer</title>
+    <style>
+        :root {
+            --primary-color: #ff2d55;
+            --background-dark: #121212;
+            --background-light: #282828;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+        }
+        
+        body {
+            background-color: var(--background-dark);
+            color: var(--text-primary);
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        
+        header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .tracks-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .track-card {
+            background-color: var(--background-light);
+            border-radius: 8px;
+            padding: 1.2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .track-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .album-cover {
+            width: 100%;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            aspect-ratio: 1;
+            object-fit: cover;
+        }
+        
+        .track-info {
+            margin-bottom: 1rem;
+        }
+        
+        .track-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .artist-name {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        audio {
+            width: 100%;
+            border-radius: 20px;
+            margin-top: 0.5rem;
+        }
+        
+        audio::-webkit-media-controls-panel {
+            background-color: var(--background-light);
+        }
+        
+        .loading {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin: 2rem 0;
+        }
+        
+        @media (max-width: 768px) {
+            .tracks-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Lecteur Deezer</h1>
+        <p>Découvrez de nouvelles musiques</p>
+    </header>
+    
+    <div id="bn" class="tracks-container">
+        <div class="loading">Chargement des morceaux...</div>
+    </div>
+
+    <script>
+        const bn = document.getElementById("bn");
+        
+        fetch(`https://cors-anywhere.herokuapp.com/https://api.deezer.com/search?q=fashion`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            console.log(data);
+            
+            if (!data.data || data.data.length === 0) {
+                bn.innerHTML = '<div class="error">Aucun résultat trouvé</div>';
+                return;
+            }
+            
+            bn.innerHTML = '';
+            
+            data.data.forEach((track) => {
+                const trackCard = document.createElement('div');
+                trackCard.className = 'track-card';
+                trackCard.innerHTML = `
+                    <img src="${track.album.cover_medium}" alt="${track.album.title}" class="album-cover">
+                    <div class="track-info">
+                        <h3 class="track-title">${track.title}</h3>
+                        <p class="artist-name">${track.artist.name}</p>
+                    </div>
+                    <audio src="${track.preview}" controls></audio>
+                `;
+                bn.appendChild(trackCard);
+            });
+        })
+        .catch((error) => {
+            console.error("Erreur :", error);
+            bn.innerHTML = `<div class="error">Erreur lors du chargement: ${error.message}</div>`;
+        });
+    </script>
+</body>
+</html>
