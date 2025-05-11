@@ -5,19 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lecteur Deezer</title>
     <style>
-        :root {
-            --primary-color: #ff2d55;
-            --background-dark: #121212;
-            --background-light: #282828;
-            --text-primary: #ffffff;
-            --text-secondary: #b3b3b3;
-        }
+
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+            
         }
         
         body {
@@ -53,6 +48,7 @@
         .track-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            background-color: red;
         }
         
         .album-cover {
@@ -102,11 +98,40 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        #search{
+            width: 85%;
+            padding: 10px;
+            border-radius: 5px;
+           bottom: none;
+            margin-bottom: 10px;
+            border-color: black;
+        }
+
+        #ui{
+            width: 10%;
+            padding: 1px;
+            border-radius: 5px;
+         
+        }
+        #box{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        
     </style>
 </head>
 <body>
+  <div id="box">
+    <input type="text" name="" id="search" placeholder="Rechercher une musique">
+    <button id="ui">Rechercher</button>
+  </div>
+  
+
     <header>
-        <h1>Lecteur Deezer</h1>
+        <h1>Lecteur Deezer avec API</h1>
         <p>Découvrez de nouvelles musiques</p>
     </header>
     
@@ -115,9 +140,19 @@
     </div>
 
     <script>
-        const bn = document.getElementById("bn");
         
-        fetch(`https://cors-anywhere.herokuapp.com/https://api.deezer.com/search?q=fashion`, {
+      const search = document.getElementById("search");
+      const ui = document.getElementById("ui");
+        const bn = document.getElementById("bn");
+        search.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    ui.click();
+  }
+});
+
+           ui.addEventListener("click", () => {
+                        
+        fetch(`https://cors-anywhere.herokuapp.com/https://api.deezer.com/search?q=${search.value}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -143,7 +178,7 @@
                         <h3 class="track-title">${track.title}</h3>
                         <p class="artist-name">${track.artist.name}</p>
                     </div>
-                    <audio src="${track.preview}" controls></audio>
+                    <audio src="${track.preview}" id='aud' controls></audio>
                 `;
                 bn.appendChild(trackCard);
             });
@@ -152,6 +187,9 @@
             console.error("Erreur :", error);
             bn.innerHTML = `<div class="error">Erreur lors du chargement: ${error.message}</div>`;
         });
+           })
+
+
     </script>
 </body>
 </html>
